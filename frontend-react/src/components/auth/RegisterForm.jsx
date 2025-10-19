@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { Field, FieldSet, Input, Saperator } from "../";
+import { api } from "../../api";
 
 const RegisterForm = () => {
   const {
@@ -9,16 +11,50 @@ const RegisterForm = () => {
     formState: { errors },
     reset,
     watch,
+    setError,
   } = useForm();
   const [showPassword, setShowPassword] = useState({
     password: false,
     confirmPassword: false,
   });
+  const navigate = useNavigate();
 
-  const onSubmit = (formData) => {
-    console.log(formData);
+  const onSubmit = async (formData) => {
+    try {
+      const payload = {
+        name: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+      };
+      const response = await api.post("/auth/signup", payload);
 
-    reset();
+      if (response.status == 201) {
+        navigate("/login", {
+          state: {
+            email: formData.email,
+            password: formData.password,
+          },
+        });
+      } else {
+        setError("root.random", {
+          type: "random",
+          message: "Failed to register",
+        });
+      }
+      reset();
+    } catch (error) {
+      if (error.response) {
+        setError("root.random", {
+          type: "random",
+          message: error.response?.data?.message || "Failed to register",
+        });
+      } else {
+        setError("root.random", {
+          type: "random",
+          message: "Failed to register",
+        });
+      }
+    }
   };
 
   return (
@@ -133,6 +169,10 @@ const RegisterForm = () => {
             Sign Up
           </button>
         </Field>
+
+        {errors.root?.random && (
+          <p className="text-red-400 text-xs mt-2"> {errors.root?.random} </p>
+        )}
       </form>
 
       <Saperator />

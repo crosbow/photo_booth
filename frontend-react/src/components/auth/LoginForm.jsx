@@ -1,18 +1,62 @@
-import { useState } from "react";
+import { use, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Field, FieldSet, Input, Saperator } from "../";
+import { api } from "../../api";
+import { AuthContext } from "../../providers/AuthProvider";
 import GoogleSignUp from "./GoogleSignUp";
 
 const LoginForm = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+    setError,
+    reset,
+  } = useForm({
+    defaultValues: {
+      email: location?.state?.email || "",
+      password: location?.state?.password || "",
+    },
+  });
   const [showPassword, setShowPassword] = useState(false);
+  const { loginUser } = use(AuthContext);
+  const [submitting, setSubmitting] = useState(false);
 
-  const onSubmit = (formData) => {
-    console.log(formData);
+  const onSubmit = async (formData) => {
+    setSubmitting(true);
+    try {
+      const response = await api.post("/auth/login", formData);
+
+      if (response.status <= 201) {
+        const { user, accessToken, refreshToken } = response.data;
+
+        loginUser(user, accessToken, refreshToken);
+        navigate("/");
+      } else {
+        setError("root.random", {
+          type: "random",
+          message: "Failed to register",
+        });
+      }
+      reset();
+    } catch (error) {
+      if (error.response) {
+        setError("root.random", {
+          type: "random",
+          message: error.response?.data?.message || "Failed to register",
+        });
+      } else {
+        setError("root.random", {
+          type: "random",
+          message: "Failed to register",
+        });
+      }
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -58,10 +102,16 @@ const LoginForm = () => {
 
         {/* Login Button */}
         <Field className="mb-4">
-          <button type="submit" className="login-button">
-            Log in
+          <button disabled={submitting} type="submit" className="login-button">
+            {submitting ? "submitting..." : "Log in"}
           </button>
         </Field>
+
+        {errors.root?.random && (
+          <p className="text-red-400 text-xs mt-2">
+            {errors.root.random.message}
+          </p>
+        )}
       </form>
 
       <Saperator />
