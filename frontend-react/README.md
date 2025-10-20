@@ -30,7 +30,7 @@
 1. Implement Routing ✓
 2. Convert Login and Register page and handle using RHF ✓
 3. Implement Authentication (Firebase and Custom Auth) + Manage JWTs (locally memory first) ✓
-4. Privet route
+4. Privet route ✓
 
 ## Routes
 

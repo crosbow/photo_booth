@@ -34,7 +34,7 @@ const LoginForm = () => {
         const { user, accessToken, refreshToken } = response.data;
 
         loginUser(user, accessToken, refreshToken);
-        navigate("/");
+        navigate("/edit");
       } else {
         setError("root.random", {
           type: "random",

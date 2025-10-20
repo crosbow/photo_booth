@@ -15,9 +15,10 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route element={<PrivetRoute />}>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+
+          <Route element={<PrivetRoute />}>
             <Route path="/profile" element={<Profile />} />
             <Route path="/create" element={<Create />} />
             <Route path="/edit" element={<Edit />} />
