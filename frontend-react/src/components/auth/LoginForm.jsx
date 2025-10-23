@@ -1,9 +1,11 @@
 import { use, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Field, FieldSet, Input, Saperator } from "../";
-import { api } from "../../api";
 import { AuthContext } from "../../providers/AuthProvider";
+import Input from "../ui/Input";
+import Saperator from "../ui/Saperator";
+import Field from "./Field";
+import FieldSet from "./FieldSet";
 import GoogleSignUp from "./GoogleSignUp";
 
 const LoginForm = () => {
@@ -17,32 +19,23 @@ const LoginForm = () => {
     reset,
   } = useForm({
     defaultValues: {
-      email: location?.state?.email || "",
-      password: location?.state?.password || "",
+      email: location?.state?.email || "mozexa@mailinator.com",
+      password: location?.state?.password || "Pa$$w0rd!",
     },
   });
-  const [showPassword, setShowPassword] = useState(false);
   const { loginUser } = use(AuthContext);
   const [submitting, setSubmitting] = useState(false);
 
   const onSubmit = async (formData) => {
     setSubmitting(true);
     try {
-      const response = await api.post("/auth/login", formData);
+      await loginUser(formData.email, formData.password);
 
-      if (response.status <= 201) {
-        const { user, accessToken, refreshToken } = response.data;
-
-        loginUser(user, accessToken, refreshToken);
-        navigate("/edit");
-      } else {
-        setError("root.random", {
-          type: "random",
-          message: "Failed to register",
-        });
-      }
+      navigate("/edit");
       reset();
     } catch (error) {
+      // console.log(error);
+
       if (error.response) {
         setError("root.random", {
           type: "random",
@@ -86,18 +79,10 @@ const LoginForm = () => {
               minLength: 6,
               maxLength: 20,
             })}
-            type={showPassword ? "text" : "password"}
-            variant="formInput"
+            type={"password"}
             isError={!!errors.password}
             placeholder="Password"
           />
-          <button
-            onClick={() => setShowPassword((prev) => !prev)}
-            type="button"
-            className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 text-xs cursor-pointer"
-          >
-            {showPassword ? "Hide" : "Show"}
-          </button>
         </Field>
 
         {/* Login Button */}

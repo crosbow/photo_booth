@@ -1,4 +1,6 @@
+import axios from "axios";
 import { createContext, useState } from "react";
+import envVars from "../config/env";
 
 export const AuthContext = createContext();
 
@@ -9,23 +11,33 @@ const AuthProvider = ({ children }) => {
     refreshToken: null,
   });
 
-  const loginUser = (user, accessToken, refreshToken) => {
-    setAuth((prev) => ({
-      ...prev,
+  const loginUser = async (email, password) => {
+    const response = await axios.post(`${envVars.BACKEND_URL}/api/auth/login`, {
+      email,
+      password,
+    });
+
+    const {
       user,
-      accessToken,
-      refreshToken,
-    }));
+      accessToken: accessTokenFromServer,
+      refreshToken: refreshTokenFromServer,
+    } = response.data;
+
+    setAuth({
+      user,
+      accessToken: accessTokenFromServer,
+      refreshToken: refreshTokenFromServer,
+    });
   };
 
   return (
     <AuthContext
       value={{
         user: auth.user,
-        loading: auth.loading,
         accessToken: auth.accessToken,
         refreshToken: auth.refreshToken,
         loginUser,
+        setAuth,
       }}
     >
       {children}

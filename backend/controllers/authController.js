@@ -52,7 +52,9 @@ const login = async (req, res) => {
 
     // Validate input
     if (!email || !password) {
-      return res.status(400).json({ message: "Both email and password are required" });
+      return res
+        .status(400)
+        .json({ message: "Both email and password are required" });
     }
 
     // Find user
@@ -136,7 +138,9 @@ const resetPassword = async (req, res) => {
 
     // Validate input
     if (!token || !newPassword) {
-      return res.status(400).json({ message: "Token and new password are required" });
+      return res
+        .status(400)
+        .json({ message: "Token and new password are required" });
     }
 
     // Verify token

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import { Logo } from "../components";
 import LoginForm from "../components/auth/LoginForm";
+import Logo from "../components/auth/Logo";
 import "../styles/login.css";
 
 const Login = () => {
